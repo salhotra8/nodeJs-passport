@@ -4,7 +4,6 @@ import { User } from "./entity/User";
 import * as dotenv from "dotenv";
 import path = require("path");
 
-// dotenv.config({ path: path.join(__dirname, "dev.env") });
 
 export const AppDataSource = new DataSource({
   type: "mysql",
