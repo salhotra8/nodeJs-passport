@@ -1,25 +1,26 @@
 pipeline {
-    agent any
-        triggers {
-        githubPush() // Triggers on pushes to the repository
-        // Or trigger on specific events like Pull Requests:
-        // githubPullRequest() // See plugin docs for detailed options
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        echo 'Building..'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building..'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
-        }
+
+    stage('Test') {
+      steps {
+        echo 'Testing..'
+      }
     }
+
+    stage('Deploy') {
+      steps {
+        echo 'Deploying....'
+      }
+    }
+
+  }
+  triggers {
+    githubPush()
+  }
 }
