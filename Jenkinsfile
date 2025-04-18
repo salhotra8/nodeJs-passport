@@ -4,7 +4,7 @@ pipeline {
     tools {
         // Make sure 'NodeJS-18' matches a NodeJS installation configured in Jenkins Global Tool Configuration
         // Or remove this block if node/npm are already available in the agent's PATH
-        nodejs 'node'
+        nodejs 'NodeJs_v22'
     }
  
     environment {
