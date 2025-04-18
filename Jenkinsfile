@@ -1,11 +1,11 @@
 pipeline {
     agent any // Or specify a label for an agent with Node.js and AWS CLI: agent { label 'nodejs-aws' }
 
-    tools {
-        // Make sure 'NodeJS-18' matches a NodeJS installation configured in Jenkins Global Tool Configuration
-        // Or remove this block if node/npm are already available in the agent's PATH
-        nodejs 'NodeJS-22'
-    }
+    // tools {
+    //     // Make sure 'NodeJS-18' matches a NodeJS installation configured in Jenkins Global Tool Configuration
+    //     // Or remove this block if node/npm are already available in the agent's PATH
+    //     nodejs 'NodeJS-22'
+    // }
  
     environment {
         // Define required variables
