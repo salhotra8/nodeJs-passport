@@ -70,7 +70,8 @@ pipeline {
                     // Include .ebextensions or Procfile if you use them.
                     // Adjust the zip command based on your project structure.
                     // Example: Zips everything except .git/* and node_modules/*
-                    sh "zip -r elastcizip . -x '.git/*' 'node_modules/*' 'Jenkinsfile' '*.zip'"
+                    sh "zip -r ${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile' '*.zip'"
+
                 }
             }
         }
