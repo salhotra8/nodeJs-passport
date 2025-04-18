@@ -59,19 +59,12 @@ pipeline {
         stage('Package Application') {
             steps {
                 script {
-                    // Create a unique version label for Elastic Beanstalk
-                    env.VERSION_LABEL = "${env.EB_APP_NAME}-${env.BUILD_NUMBER}-${new Date().format('yyyyMMddHHmmss')}"
-                    env.ARCHIVE_NAME = "${env.VERSION_LABEL}.zip"
+                env.VERSION_LABEL = "${env.EB_APP_NAME}-${env.BUILD_NUMBER}-${new Date().format('yyyyMMddHHmmss')}"
+                env.ARCHIVE_NAME = "${env.VERSION_LABEL}.zip"
 
-                    echo "Creating application archive: ${env.ARCHIVE_NAME}"
-                    // Zip the necessary files for deployment.
-                    // Crucially EXCLUDE node_modules, .git, Jenkinsfile, etc.
-                    // Include build output if you have a build step.
-                    // Include .ebextensions or Procfile if you use them.
-                    // Adjust the zip command based on your project structure.
-                    // Example: Zips everything except .git/* and node_modules/*
-                    sh "zip -r ${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile' '*.zip'"
+                echo "Creating application archive: ${env.ARCHIVE_NAME}"
 
+                sh "zip -r ${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile' '*.zip'"
                 }
             }
         }
