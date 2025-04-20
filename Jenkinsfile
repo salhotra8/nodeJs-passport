@@ -9,19 +9,17 @@ pipeline {
  
     environment {
         // Define required variables
-        // Best Practice: Store AWS Keys in Jenkins Credentials, not here!
-        AWS_CREDENTIALS_ID = '$env.AWS_CREDENTIALS_ID' // The ID of your AWS credentials stored in Jenkins
-        AWS_REGION         = '$env.AWS_REGION'                    // Replace with your AWS region (e.g., 'ap-south-1')
-        EB_APP_NAME        = '$env.EB_APP_NAME'     // Replace with your Elastic Beanstalk Application Name
-        EB_ENV_NAME        = '$env.EB_ENV_NAME'     // Replace with your Elastic Beanstalk Environment Name
-        S3_BUCKET          = '$env.S3_BUCKET' // Replace with your S3 bucket name
-        // VERSION_LABEL will be created dynamically
+        AWS_CREDENTIALS_ID = '${env.AWS_CREDENTIALS_ID}' // The ID of your AWS credentials stored in Jenkins
+        AWS_REGION         = '${env.AWS_REGION}'                    // Replace with your AWS region (e.g., 'ap-south-1')
+        EB_APP_NAME        = '${env.EB_APP_NAME}'     // Replace with your Elastic Beanstalk Application Name
+        EB_ENV_NAME        = '${env.EB_ENV_NAME}'     // Replace with your Elastic Beanstalk Environment Name
+        S3_BUCKET          = '${env.S3_BUCKET}' // Replace with your S3 bucket name
     }
 
     stages {
         stage('Debug Environment') {
         steps {
-            echo '${env}'
+            echo 'env'
         }
     }
         stage('Checkout') {
@@ -56,7 +54,7 @@ pipeline {
                 expression { fileExists('package.json') && sh(script: 'jq .scripts.build package.json', returnStatus: true) == 0 } // Check if build script exists
             }
             steps {
-                echo "Building application..."
+                echo "Building application... $env.EB_APP_NAME"
                 sh 'npm run build'
             }
         }
