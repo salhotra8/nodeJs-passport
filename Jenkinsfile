@@ -52,7 +52,7 @@ pipeline {
 
                 echo "Creating application archive: ${env.ARCHIVE_NAME}"
 
-                sh "zip -r ${env.ARCHIVE_NAME} build/ -x '.git/*' 'node_modules/*' 'Jenkinsfile' '*.zip'"
+                sh "cd build && zip -r ../${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile'"
                 }
             }
         }
