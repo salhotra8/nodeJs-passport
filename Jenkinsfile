@@ -17,6 +17,11 @@ pipeline {
         S3_BUCKET          = '${env.S3_BUCKET}' // Replace with your S3 bucket name
         // VERSION_LABEL will be created dynamically
     }
+    stage('Debug Environment') {
+    steps {
+        sh 'env'
+    }
+}
 
     stages {
         stage('Checkout') {
