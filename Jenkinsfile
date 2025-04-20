@@ -6,22 +6,7 @@ pipeline {
         // Or remove this block if node/npm are already available in the agent's PATH
         nodejs 'NodeJs_v22'
     }
- 
-    // environment {
-    //     // Define required variables
-    //     AWS_CREDENTIALS_ID = '${AWS_CREDENTIALS_ID}' // The ID of your AWS credentials stored in Jenkins
-    //     AWS_REGION         = '${AWS_REGION}'                    // Replace with your AWS region (e.g., 'ap-south-1')
-    //     EB_APP_NAME        = '${EB_APP_NAME}'     // Replace with your Elastic Beanstalk Application Name
-    //     EB_ENV_NAME        = '${EB_ENV_NAME}'     // Replace with your Elastic Beanstalk Environment Name
-    //     S3_BUCKET          = '${S3_BUCKET}' // Replace with your S3 bucket name
-    // }
-
     stages {
-        stage('Debug Environment') {
-        steps {
-            sh 'env'
-        }
-    }
         stage('Checkout') {
             steps {
                 echo "Checking out code from prod branch..."
@@ -74,7 +59,7 @@ pipeline {
 
         stage('Upload to S3') {
             steps {
-                withCredentials([aws(credentialsId: env.AWS_CREDENTIALS_ID, accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     echo "Uploading ${env.ARCHIVE_NAME} to s3://${env.S3_BUCKET}/${env.ARCHIVE_NAME}"
                     sh """
                         aws s3 cp ${env.ARCHIVE_NAME} s3://${env.S3_BUCKET}/${env.ARCHIVE_NAME} --region ${env.AWS_REGION}
@@ -85,7 +70,7 @@ pipeline {
 
         stage('Deploy to Elastic Beanstalk') {
             steps {
-                withCredentials([aws(credentialsId: env.AWS_CREDENTIALS_ID, accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     echo "Creating Elastic Beanstalk Application Version: ${env.VERSION_LABEL}"
                     sh """
                         aws elasticbeanstalk create-application-version \\
