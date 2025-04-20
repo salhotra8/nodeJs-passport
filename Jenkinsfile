@@ -21,7 +21,7 @@ pipeline {
     stages {
         stage('Debug Environment') {
         steps {
-            echo 'env'
+            echo '${env}'
         }
     }
         stage('Checkout') {
