@@ -9,17 +9,17 @@ pipeline {
  
     environment {
         // Define required variables
-        AWS_CREDENTIALS_ID = '${env.AWS_CREDENTIALS_ID}' // The ID of your AWS credentials stored in Jenkins
-        AWS_REGION         = '${env.AWS_REGION}'                    // Replace with your AWS region (e.g., 'ap-south-1')
-        EB_APP_NAME        = '${env.EB_APP_NAME}'     // Replace with your Elastic Beanstalk Application Name
-        EB_ENV_NAME        = '${env.EB_ENV_NAME}'     // Replace with your Elastic Beanstalk Environment Name
-        S3_BUCKET          = '${env.S3_BUCKET}' // Replace with your S3 bucket name
+        AWS_CREDENTIALS_ID = '${AWS_CREDENTIALS_ID}' // The ID of your AWS credentials stored in Jenkins
+        AWS_REGION         = '${AWS_REGION}'                    // Replace with your AWS region (e.g., 'ap-south-1')
+        EB_APP_NAME        = '${EB_APP_NAME}'     // Replace with your Elastic Beanstalk Application Name
+        EB_ENV_NAME        = '${EB_ENV_NAME}'     // Replace with your Elastic Beanstalk Environment Name
+        S3_BUCKET          = '${S3_BUCKET}' // Replace with your S3 bucket name
     }
 
     stages {
         stage('Debug Environment') {
         steps {
-            echo 'env'
+            sh 'env'
         }
     }
         stage('Checkout') {
