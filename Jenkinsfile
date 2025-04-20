@@ -54,7 +54,7 @@ pipeline {
                 expression { fileExists('package.json') && sh(script: 'jq .scripts.build package.json', returnStatus: true) == 0 } // Check if build script exists
             }
             steps {
-                echo "Building application... $env.EB_APP_NAME"
+                echo "Building application... ${EB_APP_NAME}"
                 sh 'npm run build'
             }
         }
