@@ -1,7 +1,7 @@
 // import * as dotenv from "dotenv";
 
 // dotenv.config({ path: `.env.${process.env.NODE_ENV || "development"}` });
-console.log(process.env.DB_URL, process.env.REMOTE_DB_PASSWORD, process.env.jwtSecret)
+console.log('fghjkl',process.env.DB_URL['DB_URL'], process.env.REMOTE_DB_PASSWORD, process.env.jwtSecret)
 
 import { AppDataSource } from "./data-source";
 import * as express from "express";

@@ -88,7 +88,8 @@ pipeline {
                           --application-name "${env.EB_APP_NAME}" \\
                           --environment-name "${env.EB_ENV_NAME}" \\
                           --version-label "${env.VERSION_LABEL}" \\
-                          --region "${env.AWS_REGION}"
+                          --region "${env.AWS_REGION}" \\
+                          ${envPropArgs}
                     """
 
                     // Optional: Add a check here to monitor deployment status until completion
