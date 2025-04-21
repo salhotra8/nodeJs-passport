@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV || "development"}` });
+// dotenv.config({ path: `.env.${process.env.NODE_ENV || "development"}` });
 
 import { AppDataSource } from "./data-source";
 import * as express from "express";
