@@ -2,12 +2,13 @@
    "name": "nodejs_project",
    "version": "1.0.0",
    "description": "Node Js Project using typescript",
-   "main": "index.js",
+   "main": "server.js",
    "scripts": {
       "test": "jest src/tests",
       "build": "tsc",
       "dev": "nodemon src/server.ts",
-      "typeorm": "typeorm-ts-node-commonjs"
+      "typeorm": "typeorm-ts-node-commonjs",
+      "start": "tsc && build/server.js"
    },
    "keywords": [],
    "author": "Himanshu Salhotra",

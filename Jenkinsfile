@@ -33,16 +33,16 @@ pipeline {
             }
         }
 
-        stage('Build Application') { // Optional: If you have a build step (e.g., for TypeScript, React, Vue)
-            when {
-                // Add condition if build is only needed sometimes, or remove 'when' block
-                expression { fileExists('package.json') && sh(script: 'jq .scripts.build package.json', returnStatus: true) == 0 } // Check if build script exists
-            }
-            steps {
-                echo "Building application... ${EB_APP_NAME}"
-                sh 'npm run build'
-            }
-        }
+        // stage('Build Application') { // Optional: If you have a build step (e.g., for TypeScript, React, Vue)
+        //     when {
+        //         // Add condition if build is only needed sometimes, or remove 'when' block
+        //         expression { fileExists('package.json') && sh(script: 'jq .scripts.build package.json', returnStatus: true) == 0 } // Check if build script exists
+        //     }
+        //     steps {
+        //         echo "Building application... ${EB_APP_NAME}"
+        //         sh 'npm run build'
+        //     }
+        // }
 
         stage('Package Application') {
             steps {
@@ -52,7 +52,7 @@ pipeline {
 
                 echo "Creating application archive: ${env.ARCHIVE_NAME}"
 
-                sh "cd build && zip -r ../${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile'"
+                sh "zip -r ${env.ARCHIVE_NAME} . -x '.git/*' 'node_modules/*' 'Jenkinsfile'"
                 }
             }
         }
