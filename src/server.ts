@@ -1,6 +1,7 @@
 // import * as dotenv from "dotenv";
 
 // dotenv.config({ path: `.env.${process.env.NODE_ENV || "development"}` });
+console.log(process.env.DB_URL, process.env.REMOTE_DB_PASSWORD, process.env.jwtSecret)
 
 import { AppDataSource } from "./data-source";
 import * as express from "express";
@@ -9,6 +10,7 @@ import { Routes } from "./routes";
 import logger from "./utils/logger";
 import * as passport from "passport";
 import { DataSource } from "typeorm";
+
 
 AppDataSource.initialize()
   .then(async (dataSource: DataSource) => {
