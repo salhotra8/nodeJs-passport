@@ -53,7 +53,7 @@ pipeline {
 
                     // Use the Jenkins 'withCredentials' step to expose AWS credentials
                     withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                         // Use AWS CLI to describe configuration settings
+                        // Use AWS CLI to describe configuration settings
                         // jq is used to filter and extract *only* the OptionSettings array for the env namespace
                         // Ensure jq is installed on your Jenkins agent
                         // We capture the raw JSON output into a Groovy variable
@@ -63,7 +63,7 @@ pipeline {
                                 --application-name "${env.EB_APP_NAME}" \\
                                 --environment-name "${env.EB_ENV_NAME}" \\
                                 --region "${env.AWS_REGION}" \\
-                                --query 'ConfigurationSettings[?Namespace==\'aws:elasticbeanstalk:application:environment\'].OptionSettings[]' \\
+                                --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:environment'].OptionSettings[]" \\
                                 --output json
                             EXIT_CODE=\$?
                             set -e # Re-enable strict mode
@@ -93,7 +93,6 @@ pipeline {
                 }
             }
         }
-        // --- END NEW STAGE ---
 
         stage('Package Application') {
             steps {
