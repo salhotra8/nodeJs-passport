@@ -12,7 +12,7 @@
    },
    "keywords": [],
    "author": "Himanshu Salhotra",
-   "license": "MIT",
+   "license": "MIT", 
    "dependencies": {
       "bcrypt": "^5.1.1",
       "body-parser": "^1.19.1",
@@ -23,10 +23,9 @@
       "passport": "^0.7.0",
       "passport-jwt": "^4.0.1",
       "passport-local": "^1.0.0",
-      "pg": "^8.4.0",
       "pino": "^9.3.1",
       "pino-pretty": "^11.2.1",
-      "typeorm": "0.3.21"
+      "typeorm": "^0.3.21"
    },
    "devDependencies": {
       "@types/bcrypt": "^5.0.2",

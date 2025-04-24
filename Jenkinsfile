@@ -2,10 +2,11 @@ pipeline {
     agent any // Or specify a label for an agent with Node.js and AWS CLI: agent { label 'nodejs-aws' }
 
     tools {
-        // Make sure 'NodeJS-18' matches a NodeJS installation configured in Jenkins Global Tool Configuration
+        // Make sure 'NodeJS-22' matches a NodeJS installation configured in Jenkins Global Tool Configuration
         // Or remove this block if node/npm are already available in the agent's PATH
         nodejs 'NodeJs_v22'
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -43,6 +44,56 @@ pipeline {
         //         sh 'npm run build'
         //     }
         // }
+
+        // Fetch Current Environment Variables ---
+        stage('Fetch Current Environment Variables') {
+            steps {
+                script {
+                    echo "Fetching current environment variables for environment: ${env.EB_ENV_NAME}"
+
+                    // Use the Jenkins 'withCredentials' step to expose AWS credentials
+                    withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                         // Use AWS CLI to describe configuration settings
+                        // jq is used to filter and extract *only* the OptionSettings array for the env namespace
+                        // Ensure jq is installed on your Jenkins agent
+                        // We capture the raw JSON output into a Groovy variable
+                        def envVarsJsonString = sh(returnStdout: true, script: """
+                            set +e # Allow the command to fail without stopping the pipeline immediately
+                            aws elasticbeanstalk describe-configuration-settings \\
+                                --application-name "${env.EB_APP_NAME}" \\
+                                --environment-name "${env.EB_ENV_NAME}" \\
+                                --region "${env.AWS_REGION}" \\
+                                --query 'ConfigurationSettings[?Namespace==\`aws:elasticbeanstalk:application:environment\`].OptionSettings[]' \\
+                                --output json
+                            EXIT_CODE=\$?
+                            set -e # Re-enable strict mode
+                            if [ \$EXIT_CODE -ne 0 ]; then
+                                echo "Warning: Could not fetch environment variables. Check IAM permissions or environment name."
+                                # Decide if you want to fail the build here or just warn
+                                // error "Failed to fetch environment variables." // Uncomment to fail the build
+                                echo "[]" # Return an empty JSON array if fetching fails to avoid breaking the next step
+                            else
+                                echo "Fetched JSON: \$(echo \${envVarsJsonString} | jq '.')" # Log the raw JSON output nicely formatted
+                                echo "\${envVarsJsonString}" # Output the raw JSON for capture by returnStdout
+                            fi
+
+                        """).trim()
+
+                        // Store the fetched JSON string in the pipeline environment variable
+                        // This makes it accessible in subsequent stages
+                        env.FETCHED_ENV_VARS_JSON = envVarsJsonString
+
+                        // Optional: Print the variables line by line for better readability in logs
+                        echo "--- Current Environment Variables ---"
+                        sh """
+                            echo '${envVarsJsonString}' | jq -r '.[] | "\\(.OptionName)=\\(.Value)"' || echo "Could not parse environment variables JSON for logging. Is jq installed?"
+                        """
+                        echo "-------------------------------------"
+                    }
+                }
+            }
+        }
+        // --- END NEW STAGE ---
 
         stage('Package Application') {
             steps {
@@ -89,12 +140,23 @@ pipeline {
                           --environment-name "${env.EB_ENV_NAME}" \\
                           --version-label "${env.VERSION_LABEL}" \\
                           --region "${env.AWS_REGION}" \\
-                          ${envPropArgs}
+                           --option-settings '${env.FETCHED_ENV_VARS_JSON}'
                     """
 
-                    // Optional: Add a check here to monitor deployment status until completion
-                    // aws elasticbeanstalk describe-environments --environment-names ${env.EB_ENV_NAME} --region ${env.AWS_REGION} | jq '.Environments[0].Status'
-                    // Loop until status is 'Ready'
+                   // Optional: Add a check here to monitor deployment status until completion
+                    // This will make the pipeline wait until the environment is Ready or Degraded
+                    echo "Waiting for environment update to complete..."
+                    sh """
+                        aws elasticbeanstalk wait environment-updated --environment-name "${env.EB_ENV_NAME}" --region "${env.AWS_REGION}"
+                        # Check the final status after waiting
+                        STATUS=\$(aws elasticbeanstalk describe-environments --environment-names "${env.EB_ENV_NAME}" --region "${env.AWS_REGION}" --query 'Environments[0].Status' --output text)
+                        HEALTH=\$(aws elasticbeanstalk describe-environments --environment-names "${env.EB_ENV_NAME}" --region "${env.AWS_REGION}" --query 'Environments[0].Health' --output text)
+                        echo "Environment status: \$STATUS, Health: \$HEALTH"
+                        if [ "\$STATUS" != "Ready" ] || [ "\$HEALTH" != "Green" ]; then
+                            echo "Environment update finished with status: \$STATUS and health: \$HEALTH"
+                            // error "Deployment failed or environment is not healthy." // Uncomment to fail the build on non-Green/Ready status
+                        fi
+                    """
                 }
             }
         }
