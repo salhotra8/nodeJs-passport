@@ -59,24 +59,22 @@ pipeline {
                         // We capture the raw JSON output into a Groovy variable
                         def envVarsJsonString = sh(returnStdout: true, script: """
                             set +e # Allow the command to fail without stopping the pipeline immediately
-                            aws elasticbeanstalk describe-configuration-settings \\
+                            RAW_JSON=$(aws elasticbeanstalk describe-configuration-settings \\
                                 --application-name "${env.EB_APP_NAME}" \\
                                 --environment-name "${env.EB_ENV_NAME}" \\
                                 --region "${env.AWS_REGION}" \\
                                 --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:environment'].OptionSettings[]" \\
-                                --output json
+                                --output json)
                             EXIT_CODE=\$?
                             set -e # Re-enable strict mode
                             if [ \$EXIT_CODE -ne 0 ]; then
                                 echo "Warning: Could not fetch environment variables. Check IAM permissions or environment name."
-                                # Decide if you want to fail the build here or just warn
-                                // error "Failed to fetch environment variables." // Uncomment to fail the build
                                 echo "[]" # Return an empty JSON array if fetching fails to avoid breaking the next step
+                                echo "RAW_JSON: []" # Still log something for debugging
                             else
-                                echo "Fetched JSON: \$(echo \${envVarsJsonString} | jq '.')" # Log the raw JSON output nicely formatted
-                                echo "\${envVarsJsonString}" # Output the raw JSON for capture by returnStdout
+                                echo "Fetched RAW JSON: \$(echo \$RAW_JSON | jq '.')" # Log the raw JSON output nicely formatted
+                                echo "\$RAW_JSON" # Output ONLY the raw JSON for capture by returnStdout
                             fi
-
                         """).trim()
 
                         // Store the fetched JSON string in the pipeline environment variable
@@ -92,7 +90,7 @@ pipeline {
                     }
                 }
             }
-        }
+}
 
         stage('Package Application') {
             steps {
