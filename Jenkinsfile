@@ -50,38 +50,27 @@ pipeline {
             steps {
                 script {
                     echo "Fetching current environment variables for environment: ${env.EB_ENV_NAME}"
-
-                    // Use the Jenkins 'withCredentials' step to expose AWS credentials
                     withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        // Use AWS CLI to describe configuration settings
-                        // jq is used to filter and extract *only* the OptionSettings array for the env namespace
-                        // Ensure jq is installed on your Jenkins agent
-                        // We capture the raw JSON output into a Groovy variable
                         def envVarsJsonString = sh(returnStdout: true, script: """
-                            set +e # Allow the command to fail without stopping the pipeline immediately
-                            RAW_JSON=$(aws elasticbeanstalk describe-configuration-settings \\
+                            set +e
+                            RAW_JSON=\$(aws elasticbeanstalk describe-configuration-settings \\
                                 --application-name "${env.EB_APP_NAME}" \\
                                 --environment-name "${env.EB_ENV_NAME}" \\
                                 --region "${env.AWS_REGION}" \\
                                 --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:environment'].OptionSettings[]" \\
                                 --output json)
                             EXIT_CODE=\$?
-                            set -e # Re-enable strict mode
+                            set -e
                             if [ \$EXIT_CODE -ne 0 ]; then
                                 echo "Warning: Could not fetch environment variables. Check IAM permissions or environment name."
-                                echo "[]" # Return an empty JSON array if fetching fails to avoid breaking the next step
-                                echo "RAW_JSON: []" # Still log something for debugging
+                                echo "[]"
+                                echo "RAW_JSON: []"
                             else
-                                echo "Fetched RAW JSON: \$(echo \$RAW_JSON | jq '.')" # Log the raw JSON output nicely formatted
-                                echo "\$RAW_JSON" # Output ONLY the raw JSON for capture by returnStdout
+                                echo "Fetched RAW JSON: \$(echo \$RAW_JSON | jq '.')"
+                                echo "\$RAW_JSON"
                             fi
                         """).trim()
-
-                        // Store the fetched JSON string in the pipeline environment variable
-                        // This makes it accessible in subsequent stages
                         env.FETCHED_ENV_VARS_JSON = envVarsJsonString
-
-                        // Optional: Print the variables line by line for better readability in logs
                         echo "--- Current Environment Variables ---"
                         sh """
                             echo '${envVarsJsonString}' | jq -r '.[] | "\\(.OptionName)=\\(.Value)"' || echo "Could not parse environment variables JSON for logging. Is jq installed?"
@@ -90,7 +79,7 @@ pipeline {
                     }
                 }
             }
-}
+        }
 
         stage('Package Application') {
             steps {
