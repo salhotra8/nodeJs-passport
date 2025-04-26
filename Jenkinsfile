@@ -46,40 +46,40 @@ pipeline {
         // }
 
         // Fetch Current Environment Variables ---
-        stage('Fetch Current Environment Variables') {
-            steps {
-                script {
-                    echo "Fetching current environment variables for environment: ${env.EB_ENV_NAME}"
-                    withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        def envVarsJsonString = sh(returnStdout: true, script: """
-                            set +e
-                            RAW_JSON=\$(aws elasticbeanstalk describe-configuration-settings \\
-                                --application-name "${env.EB_APP_NAME}" \\
-                                --environment-name "${env.EB_ENV_NAME}" \\
-                                --region "${env.AWS_REGION}" \\
-                                --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:jenkins_node_server'].OptionSettings[]" \\
-                                --output json)
-                            EXIT_CODE=\$?
-                            set -e
-                            if [ \$EXIT_CODE -ne 0 ]; then
-                                echo "Warning: Could not fetch environment variables. Check IAM permissions or environment name."
-                                echo "[]"
-                                echo "RAW_JSON: []"
-                            else
-                                echo "Fetched RAW JSON: \$(echo \$RAW_JSON | jq '.')"
-                                echo "\$RAW_JSON"
-                            fi
-                        """).trim()
-                        env.FETCHED_ENV_VARS_JSON = envVarsJsonString
-                        echo "--- Current Environment Variables ---"
-                        sh """
-                            echo '${envVarsJsonString}' | jq -r '.[] | "\\(.OptionName)=\\(.Value)"' || echo "Could not parse environment variables JSON for logging. Is jq installed?"
-                        """
-                        echo "-------------------------------------"
-                    }
-                }
-            }
-        }
+        // stage('Fetch Current Environment Variables') {
+        //     steps {
+        //         script {
+        //             echo "Fetching current environment variables for environment: ${env.EB_ENV_NAME}"
+        //             withCredentials([aws(credentialsId: '282509bd-0b66-48ff-905b-a100746fbb32', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 def envVarsJsonString = sh(returnStdout: true, script: """
+        //                     set +e
+        //                     RAW_JSON=\$(aws elasticbeanstalk describe-configuration-settings \\
+        //                         --application-name "${env.EB_APP_NAME}" \\
+        //                         --environment-name "${env.EB_ENV_NAME}" \\
+        //                         --region "${env.AWS_REGION}" \\
+        //                         --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:jenkins_node_server'].OptionSettings[]" \\
+        //                         --output json)
+        //                     EXIT_CODE=\$?
+        //                     set -e
+        //                     if [ \$EXIT_CODE -ne 0 ]; then
+        //                         echo "Warning: Could not fetch environment variables. Check IAM permissions or environment name."
+        //                         echo "[]"
+        //                         echo "RAW_JSON: []"
+        //                     else
+        //                         echo "Fetched RAW JSON: \$(echo \$RAW_JSON | jq '.')"
+        //                         echo "\$RAW_JSON"
+        //                     fi
+        //                 """).trim()
+        //                 env.FETCHED_ENV_VARS_JSON = envVarsJsonString
+        //                 echo "--- Current Environment Variables ---"
+        //                 sh """
+        //                     echo '${envVarsJsonString}' | jq -r '.[] | "\\(.OptionName)=\\(.Value)"' || echo "Could not parse environment variables JSON for logging. Is jq installed?"
+        //                 """
+        //                 echo "-------------------------------------"
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Package Application') {
             steps {
@@ -126,7 +126,6 @@ pipeline {
                           --environment-name "${env.EB_ENV_NAME}" \\
                           --version-label "${env.VERSION_LABEL}" \\
                           --region "${env.AWS_REGION}" \\
-                           --option-settings '${env.FETCHED_ENV_VARS_JSON}'
                     """
 
                    // Optional: Add a check here to monitor deployment status until completion
