@@ -17,14 +17,14 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                echo "Installing Node.js dependencies..."
-                // Clean install is often safer in CI/CD
-                sh 'npm ci'
-                // Or if you don't have package-lock.json: sh 'npm install'
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         echo "Installing Node.js dependencies..."
+        //         // Clean install is often safer in CI/CD
+        //         sh 'npm ci'
+        //         // Or if you don't have package-lock.json: sh 'npm install'
+        //     }
+        // }
 
         stage('Run Tests') { // Optional but Recommended
             steps {
