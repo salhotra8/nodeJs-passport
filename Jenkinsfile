@@ -57,7 +57,7 @@ pipeline {
                                 --application-name "${env.EB_APP_NAME}" \\
                                 --environment-name "${env.EB_ENV_NAME}" \\
                                 --region "${env.AWS_REGION}" \\
-                                --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:environment'].OptionSettings[]" \\
+                                --query "ConfigurationSettings[?Namespace=='aws:elasticbeanstalk:application:jenkins_node_server'].OptionSettings[]" \\
                                 --output json)
                             EXIT_CODE=\$?
                             set -e
